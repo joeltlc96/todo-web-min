@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Todo Web</title>
+</head>
+    <body>
+
+        <h1>Hola mundo</h1>
+        
+        <fieldset style="width: 40%;">
+            <legend>Tarea</legend>
+            <table style="width: 100%;">
+                <tr>
+                    <td>Nombre:</td>
+                    <td><input type="text" id="txtNombre" placeholder="Ingrese Nombre Tarea"></td>
+                </tr>
+                <tr>
+                    <td>Descripción:</td>
+                    <td><textarea name="" id="txtDescripcion" placeholder="Ingrese Descripción"></textarea></td>
+                    
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right;">
+                        <button onclick="Guardar()">Guardar</button>
+                    </td>
+                </tr>
+            </table>
+
+            <br>
+            <br>
+
+            <table id="tablaTareas" style="border: 1px solid;">
+                <tr>
+                    <td>nombre:</td>
+                    <td>descripcion</td>
+                    <td>complete</td>
+                    <td>creada</td>
+                </tr>
+            </table>
+        </fieldset>
+    </body>
+    <script type="text/javascript">
+
+        const apiUrl = "http://localhost:3000/todos"
+        const txtNombre = document.getElementById("txtNombre");
+        const txtDescripcion = document.getElementById("txtDescripcion");
+        const tablaTareas = document.getElementById("tablaTareas");
+        LlenarTabla();
+
+
+        async function Guardar(){
+
+            const nuevaTarea = {
+                name: txtNombre.value,
+                description: txtDescripcion.value.trim() 
+            }
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body : JSON.stringify(nuevaTarea)
+            });
+            
+            if(!response.ok){
+                alert("Error llamando al servicio");
+                return;
+            }
+
+            const TareaGuardada = await response.json();
+            alert("Tarea guardada con exito. Nuevo id: "+ TareaGuardada.id);
+        }
+
+        async function LlenarTabla(){
+            const tareas = await ObtenerTareas();
+            console.log(tareas)
+            DibujarTablas(tareas)
+        }
+
+        async function ObtenerTareas() {
+            const response = await fetch(apiUrl)
+            
+            if(!response.ok){
+                alert("Error llamando al servicio");
+                return;
+            }
+
+            const tareas = await response.json();
+            return tareas;
+        }
+
+        function DibujarTablas(tareas){
+            tareas.forEach(tarea => {
+                const nuevaFila = tablaTareas.insertRow();
+                LlenarFila(nuevaFila, tarea);
+
+            });
+        }
+
+        function LlenarFila(fila, tarea){
+            const celdaNombre = fila.insertCell(0);
+            celdaNombre.textContent = tarea.name;
+
+            const celdaDescripcion = fila.insertCell(0);
+            celdaDescripcion.textContent = tarea.celdaDescription;
+
+            const celdaCompleto= fila.insertCell(0);
+            celdaCompleto.textContent = tarea.complete === "1" ? "Yes" : "NO";
+
+            const celdaFecha = fila.insertCell();
+            const fecha = new Date(tarea.created_at);
+            celdaFecha.textContent = fecha.toLocaleDateString();
+
+            
+        }
+    </script>
+</html>
