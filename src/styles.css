@@ -1,0 +1,15 @@
+fieldset{
+    width: 40%;
+}
+
+button{
+    background-color: rgb(0, 255, 170);
+}
+
+.btnEditar{
+    background-color: aquamarine;
+}
+
+.btnEliminar{
+    background-color: aquamarine;
+}
